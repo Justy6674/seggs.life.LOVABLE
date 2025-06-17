@@ -1,0 +1,21 @@
+{
+  "name": "Seggs.life - AI Relationship & Intimacy App",
+  "short_name": "Seggs.life",
+  "description": "AI-powered relationship coaching and intimacy guidance for couples and individuals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ec4899",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["lifestyle", "health", "education"],
+  "lang": "en",
+  "dir": "ltr"
+} 

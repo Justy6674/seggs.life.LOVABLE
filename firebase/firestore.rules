@@ -1,0 +1,232 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isCouplePartner(coupleId) {
+      return exists(/databases/$(database)/documents/couples/$(coupleId)) &&
+             (get(/databases/$(database)/documents/couples/$(coupleId)).data.user1Id == request.auth.uid ||
+              get(/databases/$(database)/documents/couples/$(coupleId)).data.user2Id == request.auth.uid);
+    }
+    
+    function isValidUser() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    function isPartnerOf(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId)) &&
+             get(/databases/$(database)/documents/users/$(userId)).data.partnerId == request.auth.uid;
+    }
+    
+    // Users collection - users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) && 
+                   request.resource.data.keys().hasAll(['email', 'createdAt', 'onboardingCompleted']);
+    }
+    
+    // Couples collection - only coupled users can read their couple data
+    match /couples/{coupleId} {
+      allow read, write: if isAuthenticated() && isCouplePartner(coupleId);
+      allow create: if isAuthenticated() && 
+                   (request.resource.data.user1Id == request.auth.uid || 
+                    request.resource.data.user2Id == request.auth.uid);
+    }
+    
+    // Seggsy chat sessions - users can access their own sessions and shared sessions with partner
+    match /seggsy_sessions/{sessionId} {
+      allow read, write: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || 
+         (resource.data.partnerId != null && isOwner(resource.data.partnerId)));
+      allow create: if isAuthenticated() && 
+        isOwner(request.resource.data.userId);
+    }
+    
+    // Seggsy chat messages - users can access their own messages and shared session messages
+    match /seggsy_messages/{messageId} {
+      allow read: if isAuthenticated() && 
+        (isOwner(resource.data.userId) || 
+         (exists(/databases/$(database)/documents/seggsy_sessions/$(resource.data.sessionId)) &&
+          (isOwner(get(/databases/$(database)/documents/seggsy_sessions/$(resource.data.sessionId)).data.userId) ||
+           (get(/databases/$(database)/documents/seggsy_sessions/$(resource.data.sessionId)).data.partnerId != null &&
+            isOwner(get(/databases/$(database)/documents/seggsy_sessions/$(resource.data.sessionId)).data.partnerId)))));
+      
+      allow write: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+    }
+    
+    // Push settings - users can only access their own push settings
+    match /push_settings/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) &&
+                   request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Health records - users can only access their own health records
+    match /health_records/{recordId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/health_records/$(recordId)) &&
+        isOwner(get(/databases/$(database)/documents/health_records/$(recordId)).data.userId);
+      
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Thought bubbles - only couple partners can access
+    match /thought_bubbles/{thoughtId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/thought_bubbles/$(thoughtId)) &&
+        isCouplePartner(get(/databases/$(database)/documents/thought_bubbles/$(thoughtId)).data.coupleId);
+      
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        isCouplePartner(request.resource.data.coupleId);
+    }
+    
+    // Prompts - only couple partners can access their prompts
+    match /prompts/{promptId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/prompts/$(promptId)) &&
+        isCouplePartner(get(/databases/$(database)/documents/prompts/$(promptId)).data.coupleId);
+        
+      allow create: if isAuthenticated() && 
+        isCouplePartner(request.resource.data.coupleId);
+    }
+    
+    // Diary entries - only couple partners can access
+    match /diary/{diaryId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/diary/$(diaryId)) &&
+        isCouplePartner(get(/databases/$(database)/documents/diary/$(diaryId)).data.coupleId);
+      
+      allow create: if isAuthenticated() && 
+        request.resource.data.createdBy == request.auth.uid &&
+        isCouplePartner(request.resource.data.coupleId);
+    }
+    
+    // Shopping links - read only for authenticated users
+    match /shopping_links/{linkId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admin/functions can manage shopping links
+    }
+    
+    // Podcasts - read only for authenticated users
+    match /podcasts/{podcastId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admin/functions can manage podcast crawling
+    }
+    
+    // Pathology/Health info - read only for authenticated users, but users can log their own health records
+    match /pathology/{pathId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admin/functions can manage pathology info
+    }
+    
+    // Notifications - users can only read their own notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/notifications/$(notificationId)) &&
+        isOwner(get(/databases/$(database)/documents/notifications/$(notificationId)).data.userId);
+      
+      allow write: if false; // Only server functions can create notifications
+    }
+    
+    // Billing - only couple partners can access their billing info
+    match /billing/{billingId} {
+      allow read: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/billing/$(billingId)) &&
+        isCouplePartner(get(/databases/$(database)/documents/billing/$(billingId)).data.coupleId);
+      
+      allow write: if false; // Only server functions can manage billing
+    }
+    
+    // ===== NEW: SMART PHASE 1 COLLECTIONS =====
+    
+    // Conversations - user and partner access only
+    match /conversations/{conversationId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/conversations/$(conversationId)) &&
+        (isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId) || 
+         (get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId != null &&
+          isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId)));
+      
+      allow create: if isAuthenticated() && 
+        isOwner(request.resource.data.userId);
+    }
+    
+    // Conversation messages - same access as parent conversation
+    match /conversations/{conversationId}/messages/{messageId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/conversations/$(conversationId)) &&
+        (isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId) ||
+         (get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId != null &&
+          isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId)));
+      
+      allow create: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/conversations/$(conversationId)) &&
+        (isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId) ||
+         (get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId != null &&
+          isOwner(get(/databases/$(database)/documents/conversations/$(conversationId)).data.partnerId)));
+    }
+    
+    // User preferences - user only
+    match /userPreferences/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) &&
+                   request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Feedback - user only
+    match /feedback/{feedbackId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/feedback/$(feedbackId)) &&
+        isOwner(get(/databases/$(database)/documents/feedback/$(feedbackId)).data.userId);
+      
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Milestones - couple members only
+    match /milestones/{milestoneId} {
+      allow read, write: if isAuthenticated() && 
+        exists(/databases/$(database)/documents/milestones/$(milestoneId)) &&
+        isCouplePartner(get(/databases/$(database)/documents/milestones/$(milestoneId)).data.coupleId);
+      
+      allow create: if isAuthenticated() && 
+        isCouplePartner(request.resource.data.coupleId);
+    }
+    
+    // Journey - couple members only
+    match /journeys/{coupleId} {
+      allow read, write: if isAuthenticated() && isCouplePartner(coupleId);
+      allow create: if isAuthenticated() && isCouplePartner(coupleId);
+    }
+    
+    // Usage patterns - user only
+    match /usagePatterns/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId) &&
+                   request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Health indicators - couple members only
+    match /healthIndicators/{coupleId} {
+      allow read, write: if isAuthenticated() && isCouplePartner(coupleId);
+      allow create: if isAuthenticated() && isCouplePartner(coupleId);
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

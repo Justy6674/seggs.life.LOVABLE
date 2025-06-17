@@ -1,0 +1,321 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Cormorant Garamond', 'Inter', system-ui, serif;
+  }
+  
+  body {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: #4b4f56; /* Primary Background - Soft Deep Slate */
+    color: #d6c0a5; /* Wheat - Default text color */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .font-serif {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #d6c0a5; /* Wheat - Headings */
+    font-family: 'Cormorant Garamond', serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: #7f1d1d; /* Deep Red - Primary buttons */
+    color: #d6c0a5; /* Wheat text */
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid #7f1d1d;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-primary:hover {
+    background-color: rgba(127, 29, 29, 0.9);
+    box-shadow: 0 10px 15px -3px rgba(127, 29, 29, 0.5);
+  }
+  
+  .btn-primary:focus {
+    outline: none;
+    ring: 2px solid #d6c0a5;
+    ring-offset: 2px solid #334155;
+  }
+  
+  .btn-secondary {
+    background-color: rgba(92, 58, 58, 0.8); /* Deep Burgundy background */
+    color: #d6c0a5; /* Wheat text */
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    border: 1px solid #5c3a3a;
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(92, 58, 58, 0.6);
+  }
+  
+  .btn-danger {
+    background-color: #7f1d1d; /* Deep Red */
+    color: #d6c0a5; /* Wheat text */
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    border: 1px solid #7f1d1d;
+  }
+  
+  .btn-danger:hover {
+    background-color: rgba(127, 29, 29, 0.8);
+  }
+  
+  .card {
+    background-color: rgba(92, 58, 58, 0.8); /* Deep Burgundy background */
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(92, 58, 58, 0.6);
+  }
+  
+  .card-elegant {
+    background: linear-gradient(135deg, rgba(92, 58, 58, 0.9), rgba(92, 58, 58, 0.7)); /* Deep Burgundy gradient */
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(92, 58, 58, 0.4);
+  }
+  
+  .input-primary {
+    background-color: rgba(92, 58, 58, 0.6); /* Deep Burgundy background */
+    color: #d6c0a5; /* Wheat text */
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(92, 58, 58, 0.8);
+  }
+  
+  .input-primary::placeholder {
+    color: rgba(214, 192, 165, 0.6); /* Wheat with opacity */
+  }
+  
+  .input-primary:focus {
+    outline: none;
+    ring: 2px solid #d6c0a5;
+    border-color: #d6c0a5;
+  }
+  
+  .text-accent {
+    color: #d6c0a5; /* Wheat */
+  }
+  
+  .text-highlight {
+    color: #7f1d1d; /* Deep Red */
+  }
+  
+  .divider {
+    margin: 1.5rem 0;
+    border-top: 1px solid rgba(92, 58, 58, 0.5); /* Deep Burgundy border */
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: rgba(92, 58, 58, 0.6); /* Deep Burgundy background */
+    color: #d6c0a5; /* Wheat text */
+  }
+  
+  .badge-highlight {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #7f1d1d; /* Deep Red */
+    color: #d6c0a5; /* Wheat text */
+  }
+}
+
+@layer utilities {
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 5px rgba(214, 192, 165, 0.3);
+    }
+    to {
+      box-shadow: 0 0 20px rgba(214, 192, 165, 0.6);
+    }
+  }
+  
+  .glass-effect {
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(92, 58, 58, 0.75); /* Deep Burgundy with transparency */
+    border: 1px solid rgba(214, 192, 165, 0.125);
+  }
+}
+
+/* Custom scrollbar styling for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #4b4f56; /* Primary background */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(214, 192, 165, 0.4); /* Wheat with opacity */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(214, 192, 165, 0.6); /* Wheat with higher opacity */
+}
+
+/* Focus styles for accessibility */
+.focus-visible {
+  outline: none;
+  ring: 2px solid #d6c0a5; /* Wheat */
+  ring-offset: 2px solid #4b4f56; /* Primary background */
+}
+
+/* Custom slider styles for onboarding */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: #5c3a3a; /* Deep Burgundy */
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d6c0a5; /* Wheat */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #4b4f56; /* Primary background */
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #7f1d1d; /* Deep Red on hover */
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d6c0a5; /* Wheat */
+  cursor: pointer;
+  border: 2px solid #4b4f56; /* Primary background */
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #7f1d1d; /* Deep Red on hover */
+  transform: scale(1.1);
+}
+
+.slider:focus {
+  box-shadow: 0 0 0 3px rgba(214, 192, 165, 0.3); /* Wheat with opacity */
+}
+
+/* Custom checkbox and radio styles */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: #d6c0a5; /* Wheat */
+  border-color: #d6c0a5; /* Wheat */
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+  box-shadow: 0 0 0 3px rgba(214, 192, 165, 0.3); /* Wheat with opacity */
+  border-color: #d6c0a5; /* Wheat */
+}
+
+/* Better hover states for form elements */
+.card:hover {
+  border-color: rgba(92, 58, 58, 0.8); /* Deep Burgundy */
+  background-color: rgba(92, 58, 58, 0.9); /* Deep Burgundy */
+}
+
+/* Improved textarea styling */
+textarea:focus {
+  border-color: #d6c0a5; /* Wheat */
+  box-shadow: 0 0 0 3px rgba(214, 192, 165, 0.3); /* Wheat with opacity */
+}
+
+/* Animation for progress bar */
+.progress-bar {
+  transition: width 0.5s ease-in-out;
+}
+
+/* Custom scrollbar for long questionnaire */
+.onboarding-container {
+  scrollbar-width: thin;
+  scrollbar-color: #d6c0a5 #4b4f56; /* Wheat thumb, Primary background track */
+}
+
+.onboarding-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.onboarding-container::-webkit-scrollbar-track {
+  background-color: #4b4f56; /* Primary background */
+}
+
+.onboarding-container::-webkit-scrollbar-thumb {
+  background-color: rgba(214, 192, 165, 0.6); /* Wheat with opacity */
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.onboarding-container::-webkit-scrollbar-thumb:hover {
+  background-color: #d6c0a5; /* Wheat */
+}
+
+/* Confetti animation */
+.confetti {
+  animation: confetti 3s ease-in-out infinite;
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #4b4f56 0%, #d6c0a5 100%);
+}
+
+.accent-gradient {
+  background: #334155; /* Deep Burgundy */
+} 
